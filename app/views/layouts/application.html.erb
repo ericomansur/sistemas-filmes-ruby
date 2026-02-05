@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -44,8 +44,7 @@
                 </button>
                 
                 <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 hidden group-hover:block border border-gray-700">
-                  <%= link_to destroy_user_session_path, data: { turbo_method: :delete }, class: "block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition" do %>
-                    Sair
+                  <%= button_to destroy_user_session_path, method: :delete, form: { data: { turbo: false } }, class: "block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition" do %>                    Sair
                   <% end %>
                 </div>
               </div>
