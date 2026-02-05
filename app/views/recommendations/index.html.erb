@@ -121,9 +121,7 @@
 
     <!-- Pagination -->
     <div class="flex justify-center mt-8">
-      <%= paginate @recommendations, theme: 'twitter-bootstrap-4', 
-                   pagination_class: "pagination-custom",
-                   nav_class: "flex space-x-2" %>
+      <%= paginate @recommendations %>
     </div>
   <% end %>
 
