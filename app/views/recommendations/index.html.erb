@@ -1,0 +1,162 @@
+<div class="space-y-8">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-bold text-white mb-2">🎬 Suas Recomendações</h1>
+      <p class="text-gray-400 text-lg">
+        Filmes selecionados especialmente para você
+      </p>
+    </div>
+    
+    <div class="flex gap-3">
+      <%= link_to edit_preferences_path, class: "bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
+        ⚙️ Ajustar Preferências
+      <% end %>
+      
+      <%= link_to generate_recommendations_path, method: :post, data: { turbo_method: :post, turbo_confirm: "Isso irá substituir suas recomendações atuais. Continuar?" }, class: "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
+        🔄 Gerar Novas
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <% if @recommendations.empty? && !current_user.preference.has_preferences? %>
+    <div class="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
+      <div class="text-6xl mb-4">🎭</div>
+      <h2 class="text-2xl font-bold text-white mb-3">Nenhuma recomendação ainda</h2>
+      <p class="text-gray-400 mb-6 max-w-md mx-auto">
+        Configure suas preferências para começar a receber recomendações personalizadas de filmes!
+      </p>
+      <%= link_to edit_preferences_path, class: "inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition" do %>
+        Configurar Preferências
+      <% end %>
+    </div>
+  <% elsif @recommendations.empty? %>
+    <div class="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
+      <div class="text-6xl mb-4">🔍</div>
+      <h2 class="text-2xl font-bold text-white mb-3">Ops! Nenhum filme encontrado</h2>
+      <p class="text-gray-400 mb-6 max-w-md mx-auto">
+        Tente ajustar suas preferências para obter mais resultados.
+      </p>
+      <div class="flex gap-3 justify-center">
+        <%= link_to edit_preferences_path, class: "bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
+          Ajustar Preferências
+        <% end %>
+        <%= link_to generate_recommendations_path, method: :post, data: { turbo_method: :post }, class: "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
+          Tentar Novamente
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <!-- Stats Bar -->
+    <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-6">
+          <div>
+            <span class="text-gray-400 text-sm">Total de Recomendações:</span>
+            <span class="text-white font-bold ml-2"><%= @recommendations.total_count %></span>
+          </div>
+          <div>
+            <span class="text-gray-400 text-sm">Não Assistidos:</span>
+            <span class="text-white font-bold ml-2"><%= current_user.recommendations.unwatched.count %></span>
+          </div>
+          <div>
+            <span class="text-gray-400 text-sm">Já Assistidos:</span>
+            <span class="text-green-400 font-bold ml-2"><%= current_user.recommendations.watched.count %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Movies Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+      <% @recommendations.each do |recommendation| %>
+        <div class="group">
+          <%= link_to recommendation_path(recommendation), class: "block" do %>
+            <div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-indigo-500 transition transform hover:scale-105 hover:shadow-xl">
+              <% if recommendation.poster_path %>
+                <%= image_tag recommendation.poster_url, alt: recommendation.title, class: "w-full h-80 object-cover" %>
+              <% else %>
+                <div class="w-full h-80 bg-gray-700 flex items-center justify-center">
+                  <span class="text-5xl">🎬</span>
+                </div>
+              <% end %>
+              
+              <div class="p-3">
+                <h3 class="text-white font-medium text-sm truncate group-hover:text-indigo-400 transition">
+                  <%= recommendation.title %>
+                </h3>
+                
+                <div class="flex items-center justify-between mt-2">
+                  <div class="flex items-center">
+                    <span class="text-yellow-400 text-xs">⭐</span>
+                    <span class="text-gray-400 text-xs ml-1"><%= recommendation.rating&.round(1) || "N/A" %></span>
+                  </div>
+                  
+                  <% unless recommendation.watched? %>
+                    <span class="text-xs bg-indigo-600 text-white px-2 py-1 rounded">Novo</span>
+                  <% else %>
+                    <span class="text-xs bg-green-600 text-white px-2 py-1 rounded">✓ Visto</span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          
+          <!-- Quick Actions -->
+          <div class="mt-2 flex gap-2">
+            <% unless recommendation.watched? %>
+              <%= link_to mark_watched_recommendation_path(recommendation), method: :patch, data: { turbo_method: :patch }, class: "flex-1 bg-green-700 hover:bg-green-600 text-white text-xs py-1 px-2 rounded transition text-center" do %>
+                ✓ Marcar como Visto
+              <% end %>
+            <% end %>
+            
+            <%= link_to recommendation_path(recommendation), method: :delete, data: { turbo_method: :delete, turbo_confirm: "Remover esta recomendação?" }, class: "bg-red-700 hover:bg-red-600 text-white text-xs py-1 px-2 rounded transition" do %>
+              🗑️
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center mt-8">
+      <%= paginate @recommendations, theme: 'twitter-bootstrap-4', 
+                   pagination_class: "pagination-custom",
+                   nav_class: "flex space-x-2" %>
+    </div>
+  <% end %>
+
+  <!-- Watched Movies Section -->
+  <% if @watched_recommendations.any? %>
+    <div class="border-t border-gray-700 pt-8">
+      <h2 class="text-2xl font-bold text-white mb-4">📺 Filmes que Você Já Assistiu</h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <% @watched_recommendations.each do |recommendation| %>
+          <%= link_to recommendation_path(recommendation), class: "group" do %>
+            <div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-green-500 transition opacity-75 hover:opacity-100">
+              <% if recommendation.poster_path %>
+                <%= image_tag recommendation.poster_url, alt: recommendation.title, class: "w-full h-64 object-cover" %>
+              <% else %>
+                <div class="w-full h-64 bg-gray-700 flex items-center justify-center">
+                  <span class="text-4xl">🎬</span>
+                </div>
+              <% end %>
+              
+              <div class="p-3">
+                <h3 class="text-white font-medium text-sm truncate group-hover:text-green-400 transition">
+                  <%= recommendation.title %>
+                </h3>
+                <div class="flex items-center mt-1">
+                  <span class="text-yellow-400 text-xs">⭐</span>
+                  <span class="text-gray-400 text-xs ml-1"><%= recommendation.rating&.round(1) || "N/A" %></span>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

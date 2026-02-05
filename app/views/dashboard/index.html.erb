@@ -1,0 +1,141 @@
+<div class="space-y-8">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-indigo-900 to-purple-900 rounded-lg p-8 border border-indigo-700">
+    <h1 class="text-4xl font-bold text-white mb-2">
+      Olá, <%= current_user.email.split('@').first.capitalize %>! 👋
+    </h1>
+    <p class="text-indigo-200 text-lg">
+      Bem-vindo ao seu painel de controle cinematográfico
+    </p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-gray-400 text-sm font-medium">Recomendações</p>
+          <p class="text-3xl font-bold text-white mt-1"><%= @recommendations.count %></p>
+        </div>
+        <div class="bg-indigo-600 rounded-full p-3">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-gray-400 text-sm font-medium">Filmes Assistidos</p>
+          <p class="text-3xl font-bold text-white mt-1"><%= @watched_count %></p>
+        </div>
+        <div class="bg-green-600 rounded-full p-3">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-gray-400 text-sm font-medium">Preferências</p>
+          <p class="text-3xl font-bold text-white mt-1">
+            <%= @has_preferences ? "✓" : "✗" %>
+          </p>
+        </div>
+        <div class="<%= @has_preferences ? 'bg-green-600' : 'bg-yellow-600' %> rounded-full p-3">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <% unless @has_preferences %>
+    <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-6">
+      <div class="flex items-start space-x-4">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-medium text-yellow-400">Configure suas preferências!</h3>
+          <p class="text-yellow-200 mt-1">
+            Para receber recomendações personalizadas, você precisa configurar suas preferências de filmes.
+          </p>
+          <%= link_to edit_preferences_path, class: "inline-block mt-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded transition" do %>
+            Configurar Agora →
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Recent Recommendations -->
+  <% if @recommendations.any? %>
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold text-white">Suas Recomendações Recentes</h2>
+        <%= link_to recommendations_path, class: "text-indigo-400 hover:text-indigo-300 font-medium" do %>
+          Ver todas →
+        <% end %>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <% @recommendations.each do |recommendation| %>
+          <%= link_to recommendation_path(recommendation), class: "group" do %>
+            <div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-indigo-500 transition transform hover:scale-105">
+              <% if recommendation.poster_path %>
+                <%= image_tag recommendation.poster_url, alt: recommendation.title, class: "w-full h-64 object-cover" %>
+              <% else %>
+                <div class="w-full h-64 bg-gray-700 flex items-center justify-center">
+                  <span class="text-4xl">🎬</span>
+                </div>
+              <% end %>
+              <div class="p-3">
+                <h3 class="text-white font-medium text-sm truncate group-hover:text-indigo-400 transition">
+                  <%= recommendation.title %>
+                </h3>
+                <div class="flex items-center mt-1">
+                  <span class="text-yellow-400 text-xs">⭐</span>
+                  <span class="text-gray-400 text-xs ml-1"><%= recommendation.rating&.round(1) || "N/A" %></span>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Action Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+      <h3 class="text-xl font-semibold text-white mb-2">🎯 Gerar Novas Recomendações</h3>
+      <p class="text-gray-400 mb-4">
+        Atualize suas recomendações com base nas suas preferências atuais.
+      </p>
+      <%= link_to generate_recommendations_path, method: :post, data: { turbo_method: :post }, class: "inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition" do %>
+        Gerar Recomendações
+      <% end %>
+    </div>
+
+    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+      <h3 class="text-xl font-semibold text-white mb-2">⚙️ Ajustar Preferências</h3>
+      <p class="text-gray-400 mb-4">
+        Modifique seus gêneros favoritos, anos de lançamento e mais.
+      </p>
+      <%= link_to edit_preferences_path, class: "inline-block bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded transition" do %>
+        Editar Preferências
+      <% end %>
+    </div>
+  </div>
+</div>
