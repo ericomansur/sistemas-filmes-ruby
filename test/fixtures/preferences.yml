@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  favorite_genres: MyText
+  min_year: 1
+  max_year: 1
+  min_rating: 9.99
+  preferred_language: MyString
+
+two:
+  user: two
+  favorite_genres: MyText
+  min_year: 1
+  max_year: 1
+  min_rating: 9.99
+  preferred_language: MyString
