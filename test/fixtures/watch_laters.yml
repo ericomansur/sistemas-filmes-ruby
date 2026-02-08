@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  tmdb_id: 1
+  title: MyString
+  poster_path: MyString
+  overview: MyText
+  rating: 9.99
+  genre_ids: MyText
+  release_date: MyString
+
+two:
+  user: two
+  tmdb_id: 1
+  title: MyString
+  poster_path: MyString
+  overview: MyText
+  rating: 9.99
+  genre_ids: MyText
+  release_date: MyString

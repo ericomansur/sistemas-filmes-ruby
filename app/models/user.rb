@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   has_one :preference, dependent: :destroy
   has_many :recommendations, dependent: :destroy
+  has_many :watch_laters, dependent: :destroy
 
   after_create :create_default_preference
 

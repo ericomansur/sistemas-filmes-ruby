@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_05_040344) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_08_013252) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -58,6 +58,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_040344) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "watch_laters", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "genre_ids"
+    t.text "overview"
+    t.string "poster_path"
+    t.decimal "rating"
+    t.string "release_date"
+    t.string "title"
+    t.integer "tmdb_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_watch_laters_on_user_id"
+  end
+
   add_foreign_key "preferences", "users"
   add_foreign_key "recommendations", "users"
+  add_foreign_key "watch_laters", "users"
 end

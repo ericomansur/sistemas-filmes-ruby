@@ -23,7 +23,11 @@ class RecommendationsController < ApplicationController
   def mark_watched
     @recommendation = current_user.recommendations.find(params[:id])
     @recommendation.mark_as_watched!
-    redirect_to recommendations_path, notice: 'Filme marcado como assistido!'
+    
+    respond_to do |format|
+      format.html { redirect_to recommendations_path, notice: 'Filme marcado como assistido!' }
+      format.json { head :no_content }
+    end
   end
 
   def generate
@@ -34,7 +38,11 @@ class RecommendationsController < ApplicationController
   def destroy
     @recommendation = current_user.recommendations.find(params[:id])
     @recommendation.destroy
-    redirect_to recommendations_path, notice: 'Recomendação removida!'
+    
+    respond_to do |format|
+      format.html { redirect_to recommendations_path, notice: 'Recomendação removida!' }
+      format.json { head :no_content }
+    end
   end
 
   private
@@ -58,16 +66,19 @@ class RecommendationsController < ApplicationController
     )
 
     # Salvar como recomendações
-    movies&.first(20)&.each do |movie|
-      current_user.recommendations.find_or_create_by(tmdb_id: movie['id']) do |rec|
-        rec.title = movie['title']
-        rec.poster_path = movie['poster_path']
-        rec.overview = movie['overview']
-        rec.rating = movie['vote_average']
-        rec.watched = false
+    if movies.present?
+      movies.first(20).each do |movie|
+        current_user.recommendations.find_or_create_by(tmdb_id: movie['id']) do |rec|
+          rec.title = movie['title']
+          rec.poster_path = movie['poster_path']
+          rec.overview = movie['overview']
+          rec.rating = movie['vote_average']
+          rec.watched = false
+        end
       end
     end
   rescue => e
     Rails.logger.error "Erro ao gerar recomendações: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
   end
 end

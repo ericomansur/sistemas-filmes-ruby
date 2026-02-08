@@ -12,7 +12,13 @@ class TmdbService
       api_key: @api_key,
       language: 'pt-BR'
     })
-    response['genres'] if response.success?
+    
+    if response.success?
+      response['genres']
+    else
+      Rails.logger.error "TMDB API Error: #{response.code} - #{response.message}"
+      nil
+    end
   end
 
   # Descobrir filmes com filtros
@@ -22,7 +28,8 @@ class TmdbService
       language: params[:language] || 'pt-BR',
       sort_by: 'vote_average.desc',
       'vote_count.gte': 100,
-      page: params[:page] || 1
+      page: params[:page] || 1,
+      include_adult: false
     }
 
     # Adicionar filtros opcionais
@@ -32,25 +39,45 @@ class TmdbService
     query['vote_average.gte'] = params[:min_rating] if params[:min_rating].present?
 
     response = self.class.get('/discover/movie', query: query)
-    response['results'] if response.success?
+    
+    if response.success?
+      response['results']
+    else
+      Rails.logger.error "TMDB API Error: #{response.code} - #{response.message}"
+      []
+    end
   end
 
   # Buscar detalhes de um filme
   def movie_details(movie_id)
     response = self.class.get("/movie/#{movie_id}", query: {
       api_key: @api_key,
-      language: 'pt-BR'
+      language: 'pt-BR',
+      append_to_response: 'credits,videos,images'
     })
-    response if response.success?
+    
+    if response.success?
+      response.parsed_response
+    else
+      Rails.logger.error "TMDB API Error: #{response.code} - #{response.message}"
+      nil
+    end
   end
 
   # Buscar filmes similares
   def similar_movies(movie_id)
     response = self.class.get("/movie/#{movie_id}/similar", query: {
       api_key: @api_key,
-      language: 'pt-BR'
+      language: 'pt-BR',
+      page: 1
     })
-    response['results'] if response.success?
+    
+    if response.success?
+      response['results']
+    else
+      Rails.logger.error "TMDB API Error: #{response.code} - #{response.message}"
+      []
+    end
   end
 
   # Buscar filmes populares
@@ -60,11 +87,28 @@ class TmdbService
       language: 'pt-BR',
       page: page
     })
-    response['results'] if response.success?
+    
+    if response.success?
+      response['results']
+    else
+      Rails.logger.error "TMDB API Error: #{response.code} - #{response.message}"
+      []
+    end
+  end
+
+  # Buscar filme por ID TMDB
+  def find_movie(tmdb_id)
+    movie_details(tmdb_id)
   end
 
   # URL completa do poster
   def self.poster_url(path, size = 'w500')
+    return nil unless path
+    "https://image.tmdb.org/t/p/#{size}#{path}"
+  end
+  
+  # URL completa do backdrop
+  def self.backdrop_url(path, size = 'original')
     return nil unless path
     "https://image.tmdb.org/t/p/#{size}#{path}"
   end
