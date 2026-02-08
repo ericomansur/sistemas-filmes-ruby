@@ -1,0 +1,119 @@
+<div class="space-y-8">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-bold text-white mb-2">⏰ Assistir Mais Tarde</h1>
+      <p class="text-gray-400 text-lg">
+        Seus filmes salvos para assistir depois
+      </p>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <% if @watch_laters.empty? %>
+    <div class="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
+      <div class="text-6xl mb-4">📽️</div>
+      <h2 class="text-2xl font-bold text-white mb-3">Nenhum filme na lista ainda</h2>
+      <p class="text-gray-400 mb-6 max-w-md mx-auto">
+        Adicione filmes à sua lista "Assistir Mais Tarde" para salvá-los e assistir quando quiser!
+      </p>
+      <%= link_to recommendations_path, class: "inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition" do %>
+        Ver Recomendações
+      <% end %>
+    </div>
+  <% else %>
+    <!-- Stats Bar -->
+    <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-6">
+          <div>
+            <span class="text-gray-400 text-sm">Total na Lista:</span>
+            <span class="text-white font-bold ml-2"><%= @watch_laters.total_count %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Movies Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+      <% @watch_laters.each do |watch_later| %>
+        <div class="group relative">
+          <div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-yellow-500 transition">
+            <% if watch_later.poster_path %>
+              <%= image_tag watch_later.poster_url, alt: watch_later.title, class: "w-full h-80 object-cover" %>
+            <% else %>
+              <div class="w-full h-80 bg-gray-700 flex items-center justify-center">
+                <span class="text-5xl">🎬</span>
+              </div>
+            <% end %>
+            
+            <div class="p-3">
+              <h3 class="text-white font-medium text-sm truncate group-hover:text-yellow-400 transition">
+                <%= watch_later.title %>
+              </h3>
+              
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center">
+                  <span class="text-yellow-400 text-xs">⭐</span>
+                  <span class="text-gray-400 text-xs ml-1"><%= watch_later.rating&.round(1) || "N/A" %></span>
+                </div>
+                
+                <% if watch_later.release_date.present? %>
+                  <span class="text-xs text-gray-400">
+                    <%= Date.parse(watch_later.release_date).year rescue "" %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Hover Overlay -->
+          <div class="absolute inset-0 bg-black bg-opacity-90 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 rounded-lg">
+            <h4 class="text-white font-semibold text-center mb-3 line-clamp-2"><%= watch_later.title %></h4>
+            
+            <% if watch_later.overview.present? %>
+              <p class="text-gray-300 text-xs text-center mb-4 line-clamp-3">
+                <%= watch_later.overview %>
+              </p>
+            <% end %>
+            
+            <div class="flex flex-col gap-2 w-full">
+              <%= link_to "https://www.themoviedb.org/movie/#{watch_later.tmdb_id}", 
+                         target: "_blank",
+                         class: "bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition text-center" do %>
+                👁️ Ver Detalhes
+              <% end %>
+              
+              <%= button_to watch_later_path(watch_later), 
+                           method: :delete,
+                           form: { data: { turbo: false, turbo_confirm: "Remover da lista?" } },
+                           class: "bg-red-700 hover:bg-red-600 text-white text-xs font-semibold py-2 px-4 rounded-lg transition" do %>
+                🗑️ Remover
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center mt-8">
+      <%= paginate @watch_laters %>
+    </div>
+  <% end %>
+
+  <!-- Info Box -->
+  <div class="bg-blue-900 border border-blue-700 rounded-lg p-4">
+    <div class="flex items-start space-x-3">
+      <svg class="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+      </svg>
+      <div>
+        <h4 class="text-blue-300 font-semibold">💡 Dica</h4>
+        <p class="text-blue-200 text-sm mt-1">
+          Você pode adicionar filmes à esta lista diretamente das recomendações ou ao visualizar filmes similares!
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

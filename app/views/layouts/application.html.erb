@@ -24,15 +24,19 @@
           <div class="flex items-center space-x-4">
             <% if user_signed_in? %>
               <%= link_to dashboard_path, class: "text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition" do %>
-                Dashboard
+                📊 Dashboard
               <% end %>
               
               <%= link_to recommendations_path, class: "text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition" do %>
-                Minhas Recomendações
+                🎬 Minhas Recomendações
+              <% end %>
+              
+              <%= link_to watch_laters_path, class: "text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition" do %>
+                ⏰ Assistir Mais Tarde
               <% end %>
               
               <%= link_to edit_preferences_path, class: "text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition" do %>
-                Preferências
+                ⚙️ Preferências
               <% end %>
 
               <div class="relative group">
@@ -43,8 +47,9 @@
                   </svg>
                 </button>
                 
-                <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 hidden group-hover:block border border-gray-700">
-                  <%= button_to destroy_user_session_path, method: :delete, form: { data: { turbo: false } }, class: "block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition" do %>                    Sair
+                <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 hidden group-hover:block border border-gray-700 z-50">
+                  <%= button_to destroy_user_session_path, method: :delete, form: { data: { turbo: false } }, class: "block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition" do %>
+                    🚪 Sair
                   <% end %>
                 </div>
               </div>

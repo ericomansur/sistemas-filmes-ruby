@@ -88,10 +88,10 @@
           <!-- Actions -->
           <div class="flex flex-wrap gap-3">
             <% unless @recommendation.watched? %>
-              <%= link_to mark_watched_recommendation_path(@recommendation), 
-                         method: :patch, 
-                         data: { turbo_method: :patch },
-                         class: "bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition" do %>
+              <%= button_to mark_watched_recommendation_path(@recommendation), 
+                           method: :patch,
+                           form: { data: { turbo: false } },
+                           class: "bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition" do %>
                 ✓ Marcar como Assistido
               <% end %>
             <% else %>
@@ -100,16 +100,23 @@
               </span>
             <% end %>
 
+            <%= button_to watch_laters_path(tmdb_id: @recommendation.tmdb_id),
+                         method: :post,
+                         form: { data: { turbo: false } },
+                         class: "bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-6 rounded-lg transition" do %>
+              ⏰ Assistir Mais Tarde
+            <% end %>
+
             <%= link_to "https://www.themoviedb.org/movie/#{@recommendation.tmdb_id}", 
                        target: "_blank",
-                       class: "bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg transition" do %>
+                       class: "bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg transition inline-flex items-center" do %>
               🔗 Ver no TMDB
             <% end %>
 
-            <%= link_to recommendation_path(@recommendation), 
-                       method: :delete, 
-                       data: { turbo_method: :delete, turbo_confirm: "Remover esta recomendação?" },
-                       class: "bg-red-700 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition" do %>
+            <%= button_to recommendation_path(@recommendation), 
+                         method: :delete,
+                         form: { data: { turbo: false, turbo_confirm: "Remover esta recomendação?" } },
+                         class: "bg-red-700 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition" do %>
               🗑️ Remover
             <% end %>
           </div>
@@ -124,25 +131,45 @@
         
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <% @similar_movies.first(12).each do |movie| %>
-            <div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-indigo-500 transition transform hover:scale-105">
-              <% if movie['poster_path'] %>
-                <%= image_tag TmdbService.poster_url(movie['poster_path']), 
-                             alt: movie['title'], 
-                             class: "w-full h-64 object-cover" %>
-              <% else %>
-                <div class="w-full h-64 bg-gray-700 flex items-center justify-center">
-                  <span class="text-4xl">🎬</span>
+            <div class="group relative">
+              <div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-indigo-500 transition transform hover:scale-105 cursor-pointer">
+                <% if movie['poster_path'] %>
+                  <%= image_tag TmdbService.poster_url(movie['poster_path']), 
+                               alt: movie['title'], 
+                               class: "w-full h-64 object-cover" %>
+                <% else %>
+                  <div class="w-full h-64 bg-gray-700 flex items-center justify-center">
+                    <span class="text-4xl">🎬</span>
+                  </div>
+                <% end %>
+                
+                <div class="p-3">
+                  <h3 class="text-white font-medium text-sm truncate group-hover:text-indigo-400 transition">
+                    <%= movie['title'] %>
+                  </h3>
+                  <div class="flex items-center mt-1">
+                    <span class="text-yellow-400 text-xs">⭐</span>
+                    <span class="text-gray-400 text-xs ml-1"><%= movie['vote_average']&.round(1) || "N/A" %></span>
+                  </div>
                 </div>
-              <% end %>
+              </div>
               
-              <div class="p-3">
-                <h3 class="text-white font-medium text-sm truncate">
-                  <%= movie['title'] %>
-                </h3>
-                <div class="flex items-center mt-1">
-                  <span class="text-yellow-400 text-xs">⭐</span>
-                  <span class="text-gray-400 text-xs ml-1"><%= movie['vote_average']&.round(1) || "N/A" %></span>
-                </div>
+              <!-- Hover Actions -->
+              <div class="absolute inset-0 bg-black bg-opacity-75 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 rounded-lg">
+                <h4 class="text-white font-semibold text-center mb-3 line-clamp-2"><%= movie['title'] %></h4>
+                
+                <%= button_to watch_laters_path(tmdb_id: movie['id']),
+                             method: :post,
+                             form: { data: { turbo: false } },
+                             class: "bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition w-full mb-2" do %>
+                  ⏰ Adicionar à Lista
+                <% end %>
+                
+                <%= link_to "https://www.themoviedb.org/movie/#{movie['id']}", 
+                           target: "_blank",
+                           class: "bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-2 px-4 rounded-lg transition w-full text-center" do %>
+                  👁️ Ver Detalhes
+                <% end %>
               </div>
             </div>
           <% end %>

@@ -13,7 +13,10 @@
         ⚙️ Ajustar Preferências
       <% end %>
       
-      <%= link_to generate_recommendations_path, method: :post, data: { turbo_method: :post, turbo_confirm: "Isso irá substituir suas recomendações atuais. Continuar?" }, class: "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
+      <%= button_to generate_recommendations_path,
+                   method: :post,
+                   form: { data: { turbo: false, turbo_confirm: "Isso irá substituir suas recomendações atuais. Continuar?" } },
+                   class: "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
         🔄 Gerar Novas
       <% end %>
     </div>
@@ -42,7 +45,10 @@
         <%= link_to edit_preferences_path, class: "bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
           Ajustar Preferências
         <% end %>
-        <%= link_to generate_recommendations_path, method: :post, data: { turbo_method: :post }, class: "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
+        <%= button_to generate_recommendations_path,
+                     method: :post,
+                     form: { data: { turbo: false } },
+                     class: "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition" do %>
           Tentar Novamente
         <% end %>
       </div>
@@ -106,12 +112,25 @@
           <!-- Quick Actions -->
           <div class="mt-2 flex gap-2">
             <% unless recommendation.watched? %>
-              <%= link_to mark_watched_recommendation_path(recommendation), method: :patch, data: { turbo_method: :patch }, class: "flex-1 bg-green-700 hover:bg-green-600 text-white text-xs py-1 px-2 rounded transition text-center" do %>
-                ✓ Marcar como Visto
+              <%= button_to mark_watched_recommendation_path(recommendation),
+                           method: :patch,
+                           form: { data: { turbo: false } },
+                           class: "flex-1 bg-green-700 hover:bg-green-600 text-white text-xs py-2 px-2 rounded transition text-center" do %>
+                ✓ Assistido
               <% end %>
             <% end %>
             
-            <%= link_to recommendation_path(recommendation), method: :delete, data: { turbo_method: :delete, turbo_confirm: "Remover esta recomendação?" }, class: "bg-red-700 hover:bg-red-600 text-white text-xs py-1 px-2 rounded transition" do %>
+            <%= button_to watch_laters_path(tmdb_id: recommendation.tmdb_id),
+                         method: :post,
+                         form: { data: { turbo: false } },
+                         class: "flex-1 bg-yellow-700 hover:bg-yellow-600 text-white text-xs py-2 px-2 rounded transition text-center" do %>
+              ⏰ Lista
+            <% end %>
+            
+            <%= button_to recommendation_path(recommendation),
+                         method: :delete,
+                         form: { data: { turbo: false, turbo_confirm: "Remover?" } },
+                         class: "bg-red-700 hover:bg-red-600 text-white text-xs py-2 px-2 rounded transition" do %>
               🗑️
             <% end %>
           </div>
